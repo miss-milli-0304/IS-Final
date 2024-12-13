@@ -1,0 +1,32 @@
+body {border: 5px solid navy;
+    background-color: lightblue;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;}
+h4 { color: black;
+     font-size: large;
+    border-top: 5px solid navy;
+    text-align: center;}
+h1 {color:midnightblue; 
+     font-size: xx-large;
+    text-align: center;
+    font-weight: bold;}
+.image {text-align: center;
+   border-bottom: 5px solid navy; }
+.video-container {text-align: center;}
+.key { font-size: small;
+text-align: right;
+margin-right: 10px;}
+li {color: rgb(59, 59, 76);
+font-size: large;
+font-weight: bold;
+margin-left: 30px}
+ol > li {color: rgb(12, 12, 59);
+font-size: medium;
+font-weight: lighter;}
+.nav {text-align: right;
+font-weight: bold;
+}
+.dash { width: 100%;
+    height: 100vh;
+    max-width: 100%;
+        margin: 0 auto;
+}

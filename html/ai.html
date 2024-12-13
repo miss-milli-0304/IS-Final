@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Machine Game with Trophies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: lightblue;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        nav, .instructions, .game-container, .trophy-case {
+            padding: 15px;
+            margin: 10px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        nav {
+            background-color: #333;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: white;
+            margin: 0 15px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        nav a:hover {
+            background-color: #007bff;
+            transform: scale(1.1);
+        }
+
+        .instructions, .trophy-case {
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        
+        .reels {
+            font-size: 100px;
+        }
+        
+        .message, .pity-counter {
+            margin-top: 10px;
+        }
+        
+        .explosion {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        
+        .explosion-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: gold;
+            border-radius: 50%;
+            animation: explode 1s ease-out;
+        }
+        
+        @keyframes explode {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--translateX), var(--translateY)) scale(2); }
+        }
+        
+        .trophy {
+            font-size: 24px;
+            margin: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#">Ai Game</a>
+        <a href="scratch.html">From Scratch</a>
+        <a href="index.html">Home</a>
+    </nav>
+
+    <div class="instructions">
+        <h2>Instructions</h2>
+        <p>Click "Spin" to try your luck. Match all three numbers to win!</p>
+        <p>After 70 spins, your chances increase. At 80 spins, you're guaranteed to win.</p>
+        <p>Collect trophies for each unique triple combination (111, 222, etc.)!</p>
+    </div>
+
+    <div class="game-container">
+        <div class="slot-machine">
+            <div class="reels" id="reels">000</div>
+            <button onclick="spin()">Spin</button>
+            <div class="message" id="message"></div>
+            <div class="pity-counter" id="pityCounter">Spins until guaranteed win: 80</div>
+        </div>
+    </div>
+
+    <div class="trophy-case" id="trophyCase">
+        <h3>Trophies</h3>
+    </div>
+
+    <script>
+        let spinCount = 0;
+        const PITY_THRESHOLD = 70;
+        const GUARANTEED_WIN = 80;
+        let trophies = {};
+
+        function updateTrophyCase() {
+            const trophyCase = document.getElementById('trophyCase');
+            trophyCase.innerHTML = '<h3>Trophies</h3>';
+            for (let i = 0; i <= 9; i++) {
+                const trophy = document.createElement('span');
+                trophy.className = 'trophy';
+                trophy.textContent = trophies[i] ? '🏆' : '⭕';
+                trophy.title = `${i}${i}${i}`;
+                trophyCase.appendChild(trophy);
+            }
+        }
+
+        function createExplosion() {
+            const explosionContainer = document.createElement('div');
+            explosionContainer.className = 'explosion';
+            document.body.appendChild(explosionContainer);
+
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'explosion-particle';
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 200;
+                particle.style.setProperty('--translateX', `${Math.cos(angle) * distance}px`);
+                particle.style.setProperty('--translateY', `${Math.sin(angle) * distance}px`);
+                particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                explosionContainer.appendChild(particle);
+            }
+
+            setTimeout(() => explosionContainer.remove(), 1000);
+        }
+
+        function spin() {
+            spinCount++;
+            const reels = document.getElementById('reels');
+            const message = document.getElementById('message');
+            const pityCounter = document.getElementById('pityCounter');
+            
+            let result;
+            if (spinCount >= GUARANTEED_WIN) {
+                result = '777';
+            } else if (spinCount > PITY_THRESHOLD) {
+                const winChance = (spinCount - PITY_THRESHOLD) / (GUARANTEED_WIN - PITY_THRESHOLD);
+                result = Math.random() < winChance ? '777' : Array.from({length: 3}, () => Math.floor(Math.random() * 10)).join('');
+            } else {
+                result = Array.from({length: 3}, () => Math.floor(Math.random() * 10)).join('');
+            }
+            
+            reels.textContent = result;
+
+            if (new Set(result).size === 1) {
+                message.textContent = "You win!";
+                createExplosion();
+                spinCount = 0;
+                const trophyNumber = parseInt(result[0]);
+                if (!trophies[trophyNumber]) {
+                    trophies[trophyNumber] = true;
+                    updateTrophyCase();
+                }
+            } else {
+                message.textContent = "Try again!";
+            }
+            
+            pityCounter.textContent = `Spins until guaranteed win: ${Math.max(0, GUARANTEED_WIN - spinCount)}`;
+        }
+
+        updateTrophyCase();
+    </script>
+</body>
+</html>
